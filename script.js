@@ -1,3 +1,7 @@
+const EMPATE = 0;
+const HUMANO_VITORIA = 1;
+const COMPUTADOR_VITORIA = -1; 
+
 function getComputerChoice(){
     // Gerar um número aletório entre 0 e 2
     let choice = Math.floor(Math.random() * 3);
@@ -10,53 +14,49 @@ function getComputerChoice(){
     console.log("Erro de lógica em getComputerChoice: Não deveria chegar nessa linha");
 }
 
-function getHumanChoice(){
-    let humanChoice = prompt("Insira: \"pedra\", \"papel\" ou \"tesoura\"");
-    humanChoice = humanChoice.toLowerCase();
-    while (humanChoice != "pedra" && humanChoice != "papel" && humanChoice != "tesoura"){
-        humanChoice = prompt("Atente-se a grafia. Deve ser  \"pedra\", \"papel\" ou \"tesoura\"");
-        humanChoice = humanChoice.toLowerCase();
-    }
-    return humanChoice;
-}
 
 function playRound(computerChoice, humanChoice){
-    // código para retornar quem ganhou: 0 -> humano; 1 -> maquina; 2 -> empate
+    let resultado = -1;
+    let conteudoTextoResultado = ("Você jogou: " + humanChoice + 
+                       "\nComputador jogou: " + computerChoice + 
+                       "\n");
     if (humanChoice == computerChoice){
-        // empate
-        console.log("Empatou! " + humanChoice + " empata com " + computerChoice)
-        return 2;
+        resultado = EMPATE;
+        conteudoTextoResultado += "EMPATOU";
     }
     if (humanChoice == "pedra"){
         if (computerChoice == "papel"){
-            console.log("Voce perdeu! " + humanChoice + " perde pra " + computerChoice);
-            return 1;
+            resultado = COMPUTADOR_VITORIA;
+            conteudoTextoResultado += "PERDEU PLAYBOY!";
         }
         if (computerChoice == "tesoura"){
-            console.log("Você ganhou! " + humanChoice + " ganha de " + computerChoice);
-            return 0;
+            resultado = HUMANO_VITORIA;
+            conteudoTextoResultado += "DEU SORTE. PARABÉNS PELA VITÓRIA!";
         }
     }
     if (humanChoice == "papel"){
         if (computerChoice == "tesoura"){
-            console.log("Voce perdeu! " + humanChoice + " perde pra " + computerChoice);
-            return 1;
+            resultado = COMPUTADOR_VITORIA;
+            conteudoTextoResultado += "PERDEU PLAYBOY!";
         }
         if (computerChoice == "pedra"){
-            console.log("Você ganhou! " + humanChoice + " ganha de " + computerChoice);
-            return 0;
+            resultado = HUMANO_VITORIA;
+            conteudoTextoResultado += "DEU SORTE. PARABÉNS PELA VITÓRIA!";
         }
     }
     if (humanChoice == "tesoura"){
         if (computerChoice == "pedra"){
-            console.log("Voce perdeu! " + humanChoice + " perde pra " + computerChoice);
-            return 1;
+            resultado = COMPUTADOR_VITORIA;
+            conteudoTextoResultado += "PERDEU PLAYBOY!";
         }
         if (computerChoice == "papel"){
-            console.log("Você ganhou! " + humanChoice + " ganha de " + computerChoice);
-            return 0;
+            resultado = HUMANO_VITORIA;
+            conteudoTextoResultado += "DEU SORTE. PARABÉNS PELA VITÓRIA!";
         }
     }
+    textoResultado.textContent = conteudoTextoResultado;
+    return resultado;
+    
 }
 
 function playGame(rounds){
@@ -73,4 +73,37 @@ function playGame(rounds){
     console.log("---PLACAR---\nHumano: " + humanScore + "\nComputador: " + computerScore + "\n------------");
 }
 
-playGame(5);
+btns = document.querySelectorAll("button");
+textoResultado = document.querySelector("#resultado");
+placar = document.querySelector("#placar");
+
+let humanoContagem = 0;
+let computadorContagem = 0;
+let variavelResultado = -1;
+let rodadas = 0;
+
+btns.forEach ((botao) => {
+    botao.addEventListener("click", () =>{
+        let computerChoice = getComputerChoice();
+        let humanChoice = botao.id;
+        variavelResultado = playRound(computerChoice, humanChoice);
+        if (variavelResultado == HUMANO_VITORIA) humanoContagem += 1;
+        if (variavelResultado == COMPUTADOR_VITORIA) computadorContagem += 1;
+        placar.textContent = ("Placar: " + humanoContagem + " pra você. " + computadorContagem + " pro robô.");
+        rodadas += 1;
+        if (rodadas >= 5){
+            if ( computadorContagem > humanoContagem ){
+                placar.textContent = "COMPUTADOR VENCE O JOGO!"
+            }else{
+                if(humanoContagem > computadorContagem){
+                    placar.textContent = "HUMANO VENCE O JOGO!"
+                }else{
+                    placar.textContent = "O JOGO TERMINA EM EMPATE!"
+                }
+            }
+            rodadas = 0;
+            humanoContagem = 0;
+            computadorContagem = 0;
+        }
+    });
+});
